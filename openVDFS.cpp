@@ -272,7 +272,7 @@ const FileEntry *DirectoryEntry::getFile(const char* file)
     }
     else    //dive into directories
     {
-        std::string dir = path.substr(0, dir.find_first_of('/'));
+        std::string dir = path.substr(0, path.find_first_of('/'));
         path = path.substr(path.find_first_of('/') + 1);
 
         if(subdirectories.find(dir) != subdirectories.end())
@@ -310,13 +310,15 @@ unsigned char *VDFS::getFile(const char *file)
             unsigned int bytes_read = 0;
             ret_val = new unsigned char[fe->size];
 
+			fseek(fh, fe->offset_in_file, SEEK_SET);
+
             while (bytes_read + FREAD_BUFFER_SIZE < fe->size)
             {
                 fread(ret_val + bytes_read, FREAD_BUFFER_SIZE, 1, fh);
                 bytes_read += FREAD_BUFFER_SIZE;
             }
 
-            fread(ret_val, fe->size - bytes_read, 1, fh);
+            fread(ret_val + bytes_read, fe->size - bytes_read, 1, fh);
             fclose(fh);
         }
     }
